@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NVIDIA 智算设备配置系统 - 预览</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --background: #0a0a0a;
+      --foreground: #ffffff;
+    }
+    body {
+      color: var(--foreground);
+      background: var(--background);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .nvidia-green {
+      color: #76B900;
+    }
+    .nvidia-dark {
+      background: #111111;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-950">
+  <!-- 导航栏 -->
+  <header class="sticky top-0 z-50 w-full border-b border-gray-800 bg-gray-900/95 backdrop-blur">
+    <div class="container mx-auto flex h-16 items-center justify-between px-4">
+      <div class="flex items-center gap-2">
+        <div class="h-8 w-8 bg-[#76B900] rounded flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-black"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path><path d="M12 14h.01"></path></svg>
+        </div>
+        <a href="#" class="text-xl font-bold tracking-tight text-white">
+          NVIDIA <span class="text-[#76B900]">智算配置</span>
+        </a>
+      </div>
+      <nav class="flex items-center gap-6">
+        <a href="#" class="text-sm font-medium text-gray-300 hover:text-[#76B900] transition-colors flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+          配置
+        </a>
+        <a href="#" class="text-sm font-medium text-gray-300 hover:text-[#76B900] transition-colors flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 12 2.45-2.45L7 10.1"></path><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.7 2.84"></path></svg>
+          历史
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 主内容 -->
+  <main class="container mx-auto px-4 py-8">
+    <div class="max-w-5xl mx-auto">
+      <div class="mb-8 text-center">
+        <h1 class="text-4xl font-bold mb-4">
+          NVIDIA <span class="text-[#76B900]">智算设备配置系统</span>
+        </h1>
+        <p class="text-gray-400 text-lg max-w-2xl mx-auto">
+          根据您的GPU服务器配置，智能推荐ConnectX网卡、组网方案及完整设备清单
+        </p>
+      </div>
+
+      <!-- 配置表单预览 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <!-- 基础配置 -->
+        <div class="rounded-xl border border-gray-800 bg-gray-900/50 shadow-sm">
+          <div class="flex flex-col space-y-1.5 p-6">
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#76B900]"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" x2="6.01" y1="6" y2="6"></line><line x1="6" x2="6.01" y1="18" y2="18"></line></svg>
+              <h3 class="text-lg font-semibold leading-none tracking-tight">基础配置</h3>
+            </div>
+            <p class="text-sm text-gray-400">设置服务器基本参数</p>
+          </div>
+          <div class="p-6 pt-0 space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">
+                服务器数量
+              </label>
+              <input
+                type="number"
+                min="1"
+                value="4"
+                class="w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#76B900]"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">
+                应用场景
+              </label>
+              <select
+                class="w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#76B900]"
+              >
+                <option>AI_training</option>
+                <option>AI_inference</option>
+                <option>HPC</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 快速预览 -->
+        <div class="rounded-xl border border-gray-800 bg-gray-900/50 shadow-sm">
+          <div class="flex flex-col space-y-1.5 p-6">
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#76B900]"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+              <h3 class="text-lg font-semibold leading-none tracking-tight">快速预览</h3>
+            </div>
+            <p class="text-sm text-gray-400">加载示例配置体验界面</p>
+          </div>
+          <div class="p-6 pt-0 space-y-3">
+            <button class="w-full inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#76B900] disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 border border-gray-700 text-gray-300 hover:bg-gray-800">
+              H100 8-GPU 集群 (4台)
+            </button>
+            <button class="w-full inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#76B900] disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 border border-gray-700 text-gray-300 hover:bg-gray-800">
+              L40S 推理工作站 (单机)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- GPU配置 -->
+      <div class="rounded-xl border border-gray-800 bg-gray-900/50 shadow-sm mb-8">
+        <div class="flex flex-row items-center justify-between p-6 pb-2">
+          <div>
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#76B900]"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path><path d="M12 14h.01"></path></svg>
+              <h3 class="text-lg font-semibold leading-none tracking-tight">GPU 配置</h3>
+            </div>
+            <p class="text-sm text-gray-400">配置每台服务器的GPU信息</p>
+          </div>
+          <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#76B900] disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 border border-gray-700 text-gray-300 hover:bg-gray-800">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+            添加
+          </button>
+        </div>
+        <div class="p-6 pt-0">
+          <div class="flex flex-wrap gap-4 items-end p-4 border border-gray-700 rounded-lg bg-gray-800/50">
+            <div class="flex-1 min-w-[150px]">
+              <label class="block text-sm font-medium text-gray-300 mb-1">
+                GPU 型号 1
+              </label>
+              <select class="w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#76B900]">
+                <option>H100</option>
+                <option>H200</option>
+                <option>A100</option>
+              </select>
+            </div>
+            <div class="w-32">
+              <label class="block text-sm font-medium text-gray-300 mb-1">
+                数量
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="32"
+                value="8"
+                class="w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#76B900]"
+              />
+            </div>
+            <div class="flex-1 min-w-[150px]">
+              <label class="block text-sm font-medium text-gray-300 mb-1">
+                互联模式
+              </label>
+              <select class="w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#76B900]">
+                <option>NVSwitch</option>
+                <option>NVLink</option>
+                <option>PCIe</option>
+              </select>
+            </div>
+            <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#76B900] disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 border border-red-900 text-red-400 hover:bg-red-900/20">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" x2="10" y1="11" y2="17"></line><line x1="14" x2="14" y1="11" y2="17"></line></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 提交按钮 -->
+      <div class="flex justify-center mb-8">
+        <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#76B900] disabled:pointer-events-none disabled:opacity-50 h-16 px-12 py-6 text-lg bg-[#76B900] text-black hover:bg-[#76B900]/90">
+          生成配置方案
+        </button>
+      </div>
+
+      <!-- 结果展示预览 -->
+      <div class="space-y-6">
+        <!-- 网卡推荐 -->
+        <div class="rounded-xl border border-gray-800 bg-gray-900/50 shadow-sm">
+          <div class="flex flex-col space-y-1.5 p-6">
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#76B900]"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" x2="16" y1="21" y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line></svg>
+              <h3 class="text-xl font-semibold leading-none tracking-tight">网卡推荐方案</h3>
+            </div>
+            <p class="text-sm text-gray-400">基于您的GPU配置，推荐以下网卡配置</p>
+          </div>
+          <div class="p-6 pt-0 space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                <p class="text-sm text-gray-400 mb-1">推荐网卡</p>
+                <p class="text-2xl font-bold text-[#76B900]">ConnectX-7</p>
+              </div>
+              <div class="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                <p class="text-sm text-gray-400 mb-1">每台数量</p>
+                <p class="text-2xl font-bold text-white">2 张</p>
+              </div>
+            </div>
+            
+            <div>
+              <h4 class="text-sm font-semibold text-gray-300 mb-2">技术解释</h4>
+              <p class="text-gray-400 leading-relaxed">针对H100 8-GPU配置，推荐使用ConnectX-7网卡。ConnectX-7提供400Gbps带宽，能够充分满足H100 GPU集群的高带宽需求。每台服务器配置2张网卡可实现冗余和负载均衡，配合NVSwitch架构可最大化集群性能。</p>
+            </div>
+
+            <div>
+              <h4 class="text-sm font-semibold text-gray-300 mb-2">NVIDIA 官方文档</h4>
+              <ul class="space-y-2">
+                <li>
+                  <a href="https://www.nvidia.com/en-us/networking/ethernet/adapter-cards/connectx-7/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[#76B900] hover:underline text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" x2="3" y1="12" y2="12"></line></svg>
+                    https://www.nvidia.com/en-us/networking/ethernet/adapter-cards/connectx-7/
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- 组网方案 -->
+        <div class="rounded-xl border border-gray-800 bg-gray-900/50 shadow-sm">
+          <div class="flex flex-col space-y-1.5 p-6">
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#76B900]"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" x2="16" y1="21" y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line></svg>
+              <h3 class="text-xl font-semibold leading-none tracking-tight">智算组网方案</h3>
+            </div>
+            <p class="text-sm text-gray-400">完整的集群网络架构设计</p>
+          </div>
+          <div class="p-6 pt-0 space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="p-4 border border-gray-700 rounded-lg">
+                <div class="flex items-center gap-2 mb-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                  <h4 class="font-semibold text-gray-200">组网架构</h4>
+                </div>
+                <p class="text-sm text-gray-400">采用2层胖树(Fat-Tree)拓扑架构。计算节点通过Leaf交换机连接，Leaf交换机之间通过Spine交换机互联。此架构支持线性扩展，适合中大规模AI训练集群。</p>
+              </div>
+              <div class="p-4 border border-gray-700 rounded-lg">
+                <div class="flex items-center gap-2 mb-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-400"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                  <h4 class="font-semibold text-gray-200">高可用设计</h4>
+                </div>
+                <p class="text-sm text-gray-400">所有网络设备采用N+1冗余设计。计算节点双网卡绑定，交换机采用MLAG技术实现跨设备链路聚合，确保单点故障不影响集群运行。</p>
+              </div>
+              <div class="p-4 border border-gray-700 rounded-lg">
+                <div class="flex items-center gap-2 mb-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                  <h4 class="font-semibold text-gray-200">性能预估</h4>
+                </div>
+                <p class="text-sm text-gray-400">单节点网络带宽可达800Gbps(2x400Gbps)，节点间延迟低于1.5微秒。GPU Direct RDMA技术可实现GPU内存直接访问，大幅提升通信效率。</p>
+              </div>
+              <div class="p-4 border border-gray-700 rounded-lg">
+                <div class="flex items-center gap-2 mb-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-400"><path d="M16 7h6v6"></path><path d="M12 3v18"></path><path d="M3 12h18"></path><path d="M8 17H2v-6h6"></path></svg>
+                  <h4 class="font-semibold text-gray-200">扩展性建议</h4>
+                </div>
+                <p class="text-sm text-gray-400">当前配置可支持最多64台服务器。如需扩展至更大规模，可增加Spine交换机数量或升级至3层CLOS架构。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 设备清单 -->
+        <div class="rounded-xl border border-gray-800 bg-gray-900/50 shadow-sm">
+          <div class="flex flex-row items-center justify-between p-6 pb-2">
+            <div>
+              <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#76B900]"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <h3 class="text-xl font-semibold leading-none tracking-tight">设备配置清单</h3>
+              </div>
+              <p class="text-sm text-gray-400">完整的BOM清单，包含官网链接</p>
+            </div>
+            <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#76B900] disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 border border-gray-700 text-gray-300 hover:bg-gray-800">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>
+              导出Excel
+            </button>
+          </div>
+          <div class="p-6 pt-0">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left">
+                <thead>
+                  <tr class="border-b border-gray-700">
+                    <th class="pb-3 pl-4 font-medium text-gray-400">设备类型</th>
+                    <th class="pb-3 pl-4 font-medium text-gray-400">名称</th>
+                    <th class="pb-3 pl-4 font-medium text-gray-400">型号</th>
+                    <th class="pb-3 pl-4 font-medium text-gray-400 text-right">数量</th>
+                    <th class="pb-3 pl-4 font-medium text-gray-400">链接</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-800">
+                  <tr class="hover:bg-gray-800/30">
+                    <td class="py-4 pl-4">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400">
+                        交换机
+                      </span>
+                    </td>
+                    <td class="py-4 pl-4 font-medium text-gray-200">InfiniBand交换机</td>
+                    <td class="py-4 pl-4 text-gray-400">NVIDIA Quantum-2 QM9700</td>
+                    <td class="py-4 pl-4 text-right font-bold text-white">4</td>
+                    <td class="py-4 pl-4">
+                      <a href="https://www.nvidia.com/en-us/networking/infiniband/switches/quantum-2/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[#76B900] hover:underline">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" x2="3" y1="12" y2="12"></line></svg>
+                        查看
+                      </a>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-gray-800/30">
+                    <td class="py-4 pl-4">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-400">
+                        光模块
+                      </span>
+                    </td>
+                    <td class="py-4 pl-4 font-medium text-gray-200">光模块</td>
+                    <td class="py-4 pl-4 text-gray-400">400G DR4 OSFP</td>
+                    <td class="py-4 pl-4 text-right font-bold text-white">32</td>
+                    <td class="py-4 pl-4">
+                      <a href="https://www.nvidia.com/en-us/networking/transceivers/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[#76B900] hover:underline">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" x2="3" y1="12" y2="12"></line></svg>
+                        查看
+                      </a>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-gray-800/30">
+                    <td class="py-4 pl-4">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-500/10 text-yellow-400">
+                        线缆
+                      </span>
+                    </td>
+                    <td class="py-4 pl-4 font-medium text-gray-200">InfiniBand线缆</td>
+                    <td class="py-4 pl-4 text-gray-400">400G AOC 5m</td>
+                    <td class="py-4 pl-4 text-right font-bold text-white">32</td>
+                    <td class="py-4 pl-4">
+                      <a href="https://www.nvidia.com/en-us/networking/cables/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[#76B900] hover:underline">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" x2="3" y1="12" y2="12"></line></svg>
+                        查看
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // 初始化Lucide图标
+    lucide.createIcons();
+  </script>
+</body>
+</html>
