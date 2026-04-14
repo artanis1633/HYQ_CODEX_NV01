@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 import { Home, Settings, List, Cpu } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';

@@ -3,12 +3,14 @@ import { Loader2 } from 'lucide-react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
 }
 
 export function Button({ 
   className, 
   variant = 'primary', 
+  size = 'md',
   isLoading = false,
   children,
   disabled,
@@ -20,11 +22,18 @@ export function Button({
     outline: "border border-gray-700 text-gray-300 hover:bg-gray-800",
   };
 
+  const sizes = {
+    sm: "h-8 px-3 text-xs",
+    md: "h-10 px-4 py-2 text-sm",
+    lg: "h-12 px-6 text-base",
+  };
+
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nvidia-green disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2",
+        "inline-flex items-center justify-center whitespace-nowrap rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nvidia-green disabled:pointer-events-none disabled:opacity-50",
         variants[variant],
+        sizes[size],
         className
       )}
       disabled={disabled || isLoading}
