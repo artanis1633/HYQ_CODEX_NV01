@@ -9,6 +9,7 @@ interface BOMTableProps {
 
 const typeColors = {
   nic: 'bg-purple-500/10 text-purple-400',
+  dpu: 'bg-emerald-500/10 text-emerald-400',
   switch: 'bg-blue-500/10 text-blue-400',
   transceiver: 'bg-green-500/10 text-green-400',
   cable: 'bg-yellow-500/10 text-yellow-400'
@@ -16,6 +17,7 @@ const typeColors = {
 
 const typeLabels = {
   nic: '网卡',
+  dpu: 'DPU',
   switch: '交换机',
   transceiver: '光模块',
   cable: '线缆'

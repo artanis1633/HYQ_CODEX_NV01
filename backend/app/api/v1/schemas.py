@@ -17,6 +17,22 @@ class UseCase(str, Enum):
     GENERAL_COMPUTING = "general_computing"
 
 
+class FabricType(str, Enum):
+    INFINIBAND = "InfiniBand"
+    ROCE = "RoCE"
+
+
+class DpuPolicy(str, Enum):
+    DISABLED = "disabled"
+    OPTIONAL = "optional"
+
+
+class LinkPreference(str, Enum):
+    AUTO = "auto"
+    DIRECT_ATTACH_PRIORITY = "direct_attach_priority"
+    TRANSCEIVER_PRIORITY = "transceiver_priority"
+
+
 class GPUConfig(BaseModel):
     model: str = Field(..., description="GPU型号，如H100、A100等")
     count: int = Field(..., ge=1, description="每台服务器的GPU数量")
@@ -27,6 +43,11 @@ class ConfigRequest(BaseModel):
     server_count: int = Field(..., ge=1, description="服务器数量")
     gpu_configs: List[GPUConfig] = Field(..., description="GPU配置列表")
     use_case: UseCase = Field(..., description="应用场景")
+    fabric_type: FabricType = Field(default=FabricType.INFINIBAND, description="组网路线：InfiniBand 或 RoCE")
+    dpu_policy: DpuPolicy = Field(default=DpuPolicy.DISABLED, description="默认是否自动纳入 DPU")
+    server_to_switch_distance_meters: int = Field(default=3, ge=1, description="服务器到交换机距离（米）")
+    switch_to_switch_distance_meters: int = Field(default=5, ge=1, description="交换机之间距离（米）")
+    link_preference: LinkPreference = Field(default=LinkPreference.AUTO, description="线缆与模块优先策略")
     session_id: Optional[str] = Field(None, description="会话ID，用于关联历史记录")
 
 
@@ -36,6 +57,15 @@ class ConfigResponse(BaseModel):
     message: Optional[str] = Field(None, description="状态消息")
 
 
+class PerServerAdapter(BaseModel):
+    device_type: str = Field(..., description="nic 或 dpu")
+    full_model: str = Field(..., description="设备完整型号")
+    quantity: int = Field(..., ge=1, description="单台服务器配置数量")
+    role: str = Field(..., description="角色描述")
+    speed: str = Field(..., description="设备速率")
+    port_type: str = Field(..., description="端口类型")
+
+
 class NICRecommendation(BaseModel):
     generation: str = Field(..., description="ConnectX网卡代数，如ConnectX-7")
     full_model: str = Field(..., description="完整型号，如ConnectX-7 MCX75310AAS-HEAT")
@@ -43,21 +73,28 @@ class NICRecommendation(BaseModel):
     port_count: int = Field(..., description="端口数量")
     port_type: str = Field(..., description="端口类型，如OSFP")
     speed: str = Field(..., description="速率，如400G")
+    fabric_type: FabricType = Field(..., description="当前选定的组网路线")
+    per_server_adapters: List[PerServerAdapter] = Field(default_factory=list, description="单台服务器适配清单预览")
+    planning_notes: List[str] = Field(default_factory=list, description="默认规划说明")
     explanation: str = Field(..., description="详细技术解释")
     official_links: List[str] = Field(..., description="NVIDIA官方文档链接列表")
 
 
 class NetworkDesign(BaseModel):
+    fabric_type: FabricType = Field(..., description="当前组网路线")
+    switch_type: str = Field(..., description="交换技术类型，例如 Quantum 或 Spectrum")
     architecture_type: str = Field(..., description="组网架构类型，如胖树拓扑、CLOS架构等")
     architecture_description: str = Field(..., description="组网架构详细描述")
     high_availability_design: str = Field(..., description="高可用性设计说明")
     performance_estimate: Dict[str, Any] = Field(..., description="性能预估，包括带宽、延迟等")
     scalability_suggestions: str = Field(..., description="扩展性建议")
+    cabling_guidance: List[str] = Field(default_factory=list, description="线缆与模块策略说明")
     reference_links: List[str] = Field(..., description="NVIDIA参考架构链接列表")
 
 
 class BOMItemType(str, Enum):
     NIC = "nic"
+    DPU = "dpu"
     SWITCH = "switch"
     TRANSCEIVER = "transceiver"
     CABLE = "cable"

@@ -1,0 +1,39 @@
+product_updates:
+  - full_model: ""
+    category: ""
+    family: ""
+    official_url: ""
+    datasheet_url: ""
+    protocol: ""
+    lifecycle_status: ""
+    region_availability: []
+    bus_interface: ""
+    form_factor: ""
+    switch_role: ""
+    rack_unit: ""
+    connector_type: ""
+    fiber_type: ""
+    media_type: ""
+    power_profile: ""
+    preferred_use_cases: []
+    supported_gpu_scenarios: []
+    source_refs: []
+    confidence: "medium"
+    review_status: "needs_review"
+    notes: ""
+
+compatibility_updates:
+  - source_model: ""
+    source_category: ""
+    target_model: ""
+    target_category: ""
+    compatibility_level: ""
+    conditions: []
+    speed_match: ""
+    port_match: ""
+    source_refs: []
+    verified_by: ""
+    last_verified_on: ""
+    confidence: "medium"
+    review_status: "needs_review"
+    notes: ""

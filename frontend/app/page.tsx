@@ -8,7 +8,7 @@ import NetworkDiagram from '@/components/NetworkDiagram';
 import EditableBOMTable from '@/components/EditableBOMTable';
 import ValidationPanel from '@/components/ValidationPanel';
 import { ServerConfig, ConfigResult, BOMItem } from '@/lib/types';
-import { mockConfigResult } from '@/lib/mockData';
+import { generateMockConfigResult } from '@/lib/mockData';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/Button';
 
@@ -26,7 +26,7 @@ export default function Home() {
     
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    setResult(mockConfigResult);
+    setResult(generateMockConfigResult(serverConfig));
     setIsLoading(false);
   };
 

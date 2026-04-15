@@ -20,6 +20,13 @@ export default function NetworkDiagram({ data }: NetworkDiagramProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="p-4 border border-gray-700 rounded-lg">
             <div className="flex items-center gap-2 mb-3">
+              <Layers className="h-5 w-5 text-cyan-400" />
+              <h4 className="font-semibold text-gray-200">技术路线</h4>
+            </div>
+            <p className="text-sm text-gray-400">{data.fabricType} / {data.switchType}</p>
+          </div>
+          <div className="p-4 border border-gray-700 rounded-lg">
+            <div className="flex items-center gap-2 mb-3">
               <Layers className="h-5 w-5 text-blue-400" />
               <h4 className="font-semibold text-gray-200">组网架构</h4>
             </div>
@@ -46,6 +53,17 @@ export default function NetworkDiagram({ data }: NetworkDiagramProps) {
             </div>
             <p className="text-sm text-gray-400">{data.scalability}</p>
           </div>
+        </div>
+
+        <div>
+          <h4 className="text-sm font-semibold text-gray-300 mb-3">链路规划提示</h4>
+          <ul className="space-y-2">
+            {data.cablingGuidance.map((item, idx) => (
+              <li key={idx} className="text-sm text-gray-400">
+                {item}
+              </li>
+            ))}
+          </ul>
         </div>
 
         <div>

@@ -1,0 +1,256 @@
+metadata:
+  version: "0.1.0"
+  generated_on: "2026-04-13"
+  purpose: "Initial structured product catalog converted from manual Markdown rules."
+  source_documents:
+    - "/Users/hyq/DEV SPACE/CODEX/NVIDIA-Build/backend/PRODUCT_NAMING_RULES.md"
+
+naming_rules:
+  global_requirements:
+    - "NIC names must include family name and full model."
+    - "Switch names must include the NVIDIA prefix, family, and full model."
+    - "Transceiver names must include speed, optical type, and port type."
+    - "Cable names must include the NVIDIA prefix, speed, cable type, and length."
+    - "Use canonical spacing, capitalization, and hyphenation."
+  canonical_port_types:
+    - name: "OSFP"
+      forbidden_aliases: ["ospf", "OSPF"]
+      notes: "OSPF is a routing protocol, not a port type."
+    - name: "QSFP56"
+      forbidden_aliases: ["qsfp56"]
+    - name: "QSFP28"
+      forbidden_aliases: ["qsfp28"]
+    - name: "QSFP+"
+      forbidden_aliases: ["qsfp+"]
+
+family_alias_rules:
+  nic_families:
+    - family: "ConnectX-8"
+      forbidden_aliases: ["ConnectX8", "CX8", "CX-8", "CX 8"]
+    - family: "ConnectX-7"
+      forbidden_aliases: ["ConnectX7", "CX7", "CX-7", "CX 7"]
+    - family: "ConnectX-6 Lx"
+      forbidden_aliases: ["ConnectX6Lx", "CX6Lx", "CX-6 Lx"]
+    - family: "ConnectX-6"
+      forbidden_aliases: ["ConnectX6", "CX6", "CX-6", "CX 6"]
+  switch_families:
+    - family: "NVIDIA Quantum-2"
+      forbidden_aliases: ["Quantum2", "Q2", "Quantum 2"]
+    - family: "NVIDIA Quantum"
+      forbidden_aliases: ["Quantum", "Q"]
+    - family: "NVIDIA Spectrum-X"
+      forbidden_aliases: ["SpectrumX", "SX", "Spectrum X"]
+    - family: "NVIDIA Spectrum-3"
+      forbidden_aliases: ["Spectrum3", "S3", "Spectrum 3"]
+  transceiver_models:
+    - full_model: "400G DR4 OSFP"
+      forbidden_aliases: ["400G模块", "DR4", "OSFP模块"]
+    - full_model: "200G FR4 QSFP56"
+      forbidden_aliases: ["200G模块", "FR4", "QSFP56模块"]
+    - full_model: "100G SR4 QSFP28"
+      forbidden_aliases: ["100G模块", "SR4", "QSFP28模块"]
+  cable_models:
+    - full_model: "NVIDIA 400G AOC"
+      forbidden_aliases: ["400G AOC", "AOC线缆"]
+    - full_model: "NVIDIA 200G DAC"
+      forbidden_aliases: ["200G DAC", "DAC线缆"]
+  explicit_model_rules:
+    - canonical_reference: "NVIDIA Quantum-2 QM9700"
+      forbidden_aliases: ["QM9700"]
+      notes: "The family prefix must be present."
+    - canonical_reference: "NVIDIA Spectrum-X SN4600"
+      forbidden_aliases: ["SN4600"]
+      notes: "The family prefix must be present."
+    - canonical_reference: "Length-bearing cable names"
+      forbidden_aliases: ["5m线缆"]
+      notes: "Length cannot appear without the canonical cable model."
+
+products:
+  nics:
+    - category: "nic"
+      family: "ConnectX-8"
+      full_model: "ConnectX-8 MCX85310AAS-HEAT"
+      port_count: 2
+      speed: "400G"
+      port_type: "OSFP"
+      notes: "Latest-generation SmartNIC."
+    - category: "nic"
+      family: "ConnectX-8"
+      full_model: "ConnectX-8 MCX853105AAS-HEAT"
+      port_count: 1
+      speed: "400G"
+      port_type: "OSFP"
+      notes: "Single-port variant."
+    - category: "nic"
+      family: "ConnectX-7"
+      full_model: "ConnectX-7 MCX75310AAS-HEAT"
+      port_count: 2
+      speed: "400G"
+      port_type: "OSFP"
+      notes: "Mainstream SmartNIC."
+    - category: "nic"
+      family: "ConnectX-7"
+      full_model: "ConnectX-7 MCX753105AAS-HEAT"
+      port_count: 1
+      speed: "400G"
+      port_type: "OSFP"
+      notes: "Single-port variant."
+    - category: "nic"
+      family: "ConnectX-7"
+      full_model: "ConnectX-7 MCX71310AAS-HEAT"
+      port_count: 2
+      speed: "200G"
+      port_type: "QSFP56"
+      notes: "200G variant."
+    - category: "nic"
+      family: "ConnectX-6 Lx"
+      full_model: "ConnectX-6 Lx MCX623106AN-CDAT"
+      port_count: 2
+      speed: "200G"
+      port_type: "QSFP56"
+      notes: "Cost-optimized 200G option."
+    - category: "nic"
+      family: "ConnectX-6"
+      full_model: "ConnectX-6 MCX653106A-ECAT"
+      port_count: 2
+      speed: "200G"
+      port_type: "QSFP56"
+      notes: "200G variant."
+    - category: "nic"
+      family: "ConnectX-6"
+      full_model: "ConnectX-6 MCX653105A-ECAT"
+      port_count: 1
+      speed: "200G"
+      port_type: "QSFP56"
+      notes: "Single-port variant."
+
+  switches:
+    - category: "switch"
+      family: "Quantum-2"
+      full_model: "NVIDIA Quantum-2 QM9700"
+      port_count: 64
+      speed: "400G"
+      port_type: "OSFP"
+      notes: "64-port 400G InfiniBand switch."
+    - category: "switch"
+      family: "Quantum-2"
+      full_model: "NVIDIA Quantum-2 QM8790"
+      port_count: 40
+      speed: "400G"
+      port_type: "OSFP"
+      notes: "40-port 400G InfiniBand switch."
+    - category: "switch"
+      family: "Quantum"
+      full_model: "NVIDIA Quantum QM8700"
+      port_count: 40
+      speed: "200G"
+      port_type: "QSFP56"
+      notes: "40-port 200G InfiniBand switch."
+    - category: "switch"
+      family: "Spectrum-X"
+      full_model: "NVIDIA Spectrum-X SN4600"
+      port_count: 64
+      speed: "400G"
+      port_type: "OSFP"
+      notes: "64-port 400G Ethernet switch."
+    - category: "switch"
+      family: "Spectrum-3"
+      full_model: "NVIDIA Spectrum-3 SN3700"
+      port_count: 64
+      speed: "200G"
+      port_type: "QSFP56"
+      notes: "64-port 200G Ethernet switch."
+
+  transceivers:
+    - category: "transceiver"
+      full_model: "400G DR4 OSFP"
+      speed: "400G"
+      port_type: "OSFP"
+      distance: "500m"
+      notes: "400G single-mode transceiver."
+    - category: "transceiver"
+      full_model: "400G FR4 OSFP"
+      speed: "400G"
+      port_type: "OSFP"
+      distance: "2km"
+      notes: "400G long-distance single-mode transceiver."
+    - category: "transceiver"
+      full_model: "400G SR8 OSFP"
+      speed: "400G"
+      port_type: "OSFP"
+      distance: "100m"
+      notes: "400G multimode transceiver."
+    - category: "transceiver"
+      full_model: "200G FR4 QSFP56"
+      speed: "200G"
+      port_type: "QSFP56"
+      distance: "2km"
+      notes: "200G single-mode transceiver."
+    - category: "transceiver"
+      full_model: "200G SR4 QSFP56"
+      speed: "200G"
+      port_type: "QSFP56"
+      distance: "100m"
+      notes: "200G multimode transceiver."
+    - category: "transceiver"
+      full_model: "100G SR4 QSFP28"
+      speed: "100G"
+      port_type: "QSFP28"
+      distance: "100m"
+      notes: "100G multimode transceiver."
+    - category: "transceiver"
+      full_model: "100G LR4 QSFP28"
+      speed: "100G"
+      port_type: "QSFP28"
+      distance: "10km"
+      notes: "100G single-mode transceiver."
+
+  cables:
+    - category: "cable"
+      full_model: "NVIDIA 400G AOC"
+      cable_type: "AOC"
+      local_label: "有源光缆"
+      speed: "400G"
+      interface_type: "OSFP-OSFP"
+      supported_lengths: ["3m", "5m", "10m"]
+      notes: "400G active optical cable."
+    - category: "cable"
+      full_model: "NVIDIA 200G AOC"
+      cable_type: "AOC"
+      local_label: "有源光缆"
+      speed: "200G"
+      interface_type: "QSFP56-QSFP56"
+      supported_lengths: ["3m", "5m", "10m"]
+      notes: "200G active optical cable."
+    - category: "cable"
+      full_model: "NVIDIA 100G AOC"
+      cable_type: "AOC"
+      local_label: "有源光缆"
+      speed: "100G"
+      interface_type: "QSFP28-QSFP28"
+      supported_lengths: ["3m", "5m", "10m"]
+      notes: "100G active optical cable."
+    - category: "cable"
+      full_model: "NVIDIA 400G DAC"
+      cable_type: "DAC"
+      local_label: "直连铜缆"
+      speed: "400G"
+      interface_type: "OSFP-OSFP"
+      supported_lengths: ["1m", "2m", "3m"]
+      notes: "400G direct attach copper cable."
+    - category: "cable"
+      full_model: "NVIDIA 200G DAC"
+      cable_type: "DAC"
+      local_label: "直连铜缆"
+      speed: "200G"
+      interface_type: "QSFP56-QSFP56"
+      supported_lengths: ["1m", "2m", "3m"]
+      notes: "200G direct attach copper cable."
+    - category: "cable"
+      full_model: "NVIDIA 100G DAC"
+      cable_type: "DAC"
+      local_label: "直连铜缆"
+      speed: "100G"
+      interface_type: "QSFP28-QSFP28"
+      supported_lengths: ["1m", "2m", "3m"]
+      notes: "100G direct attach copper cable."

@@ -1,0 +1,240 @@
+metadata:
+  version: "0.1.0"
+  generated_on: "2026-04-13"
+  purpose: "Initial compatibility graph converted from manual Markdown rules."
+  source_documents:
+    - "/Users/hyq/DEV SPACE/CODEX/NVIDIA-Build/backend/PRODUCT_COMPATIBILITY_RULES.md"
+
+compatibility:
+  gpu_to_nic_families:
+    - gpu_model: "H100 SXM5"
+      recommended_nic_families: ["ConnectX-7", "ConnectX-8"]
+      notes: "Highest performance; PCIe 5.0 capable."
+    - gpu_model: "H100 PCIe"
+      recommended_nic_families: ["ConnectX-7", "ConnectX-8"]
+      notes: "Balanced performance and cost."
+    - gpu_model: "H800"
+      recommended_nic_families: ["ConnectX-7", "ConnectX-8"]
+      notes: "China-market variant with H100-like performance."
+    - gpu_model: "A100 SXM4"
+      recommended_nic_families: ["ConnectX-6", "ConnectX-7"]
+      notes: "Mature and stable option."
+    - gpu_model: "A100 PCIe"
+      recommended_nic_families: ["ConnectX-6", "ConnectX-7"]
+      notes: "Balanced option."
+    - gpu_model: "A800"
+      recommended_nic_families: ["ConnectX-6", "ConnectX-7"]
+      notes: "China-market variant."
+    - gpu_model: "A10"
+      recommended_nic_families: ["ConnectX-6 Lx", "ConnectX-7"]
+      notes: "Inference-optimized option."
+    - gpu_model: "L40"
+      recommended_nic_families: ["ConnectX-6 Lx", "ConnectX-7"]
+      notes: "Inference-optimized option."
+    - gpu_model: "L40S"
+      recommended_nic_families: ["ConnectX-6 Lx", "ConnectX-7"]
+      notes: "Newer inference GPU."
+    - gpu_model: "RTX 6000"
+      recommended_nic_families: ["ConnectX-6 Lx", "ConnectX-7"]
+      notes: "Workstation-grade GPU."
+
+  interconnect_to_nic_families:
+    - interconnect_mode: "NVSwitch (H100)"
+      recommended_nic_families: ["ConnectX-7", "ConnectX-8"]
+      notes: "High-performance networking required."
+    - interconnect_mode: "NVLink (A100)"
+      recommended_nic_families: ["ConnectX-6", "ConnectX-7"]
+      notes: "Mid-tier interconnect."
+    - interconnect_mode: "PCIe"
+      recommended_nic_families: ["ConnectX-6 Lx", "ConnectX-7"]
+      notes: "General-purpose and cost-oriented."
+
+  nic_to_switch_models:
+    - nic_model: "ConnectX-8 MCX85310AAS-HEAT"
+      switch_model: "NVIDIA Quantum-2 QM9700"
+      port_match: "OSFP <-> OSFP"
+      notes: "Best InfiniBand option."
+    - nic_model: "ConnectX-8 MCX85310AAS-HEAT"
+      switch_model: "NVIDIA Spectrum-X SN4600"
+      port_match: "OSFP <-> OSFP"
+      notes: "Best Ethernet option."
+    - nic_model: "ConnectX-8 MCX853105AAS-HEAT"
+      switch_model: "NVIDIA Quantum-2 QM8790"
+      port_match: "OSFP <-> OSFP"
+      notes: "Small- to medium-scale cluster."
+    - nic_model: "ConnectX-7 MCX75310AAS-HEAT"
+      switch_model: "NVIDIA Quantum-2 QM9700"
+      port_match: "OSFP <-> OSFP"
+      notes: "Mainstream InfiniBand option."
+    - nic_model: "ConnectX-7 MCX75310AAS-HEAT"
+      switch_model: "NVIDIA Spectrum-X SN4600"
+      port_match: "OSFP <-> OSFP"
+      notes: "Mainstream Ethernet option."
+    - nic_model: "ConnectX-7 MCX75310AAS-HEAT"
+      switch_model: "NVIDIA Spectrum-3 SN3700"
+      port_match: "QSFP56 adaptation"
+      notes: "Requires a QSFP56 variant or equivalent adaptation path."
+    - nic_model: "ConnectX-7 MCX753105AAS-HEAT"
+      switch_model: "NVIDIA Quantum QM8700"
+      port_match: "QSFP56 adaptation"
+      notes: "Requires a QSFP56 variant or equivalent adaptation path."
+    - nic_model: "ConnectX-6 Lx MCX623106AN-CDAT"
+      switch_model: "NVIDIA Spectrum-3 SN3700"
+      port_match: "QSFP56 <-> QSFP56"
+      notes: "Cost-optimized Ethernet option."
+    - nic_model: "ConnectX-6 MCX653106A-ECAT"
+      switch_model: "NVIDIA Quantum QM8700"
+      port_match: "QSFP56 <-> QSFP56"
+      notes: "Mature InfiniBand option."
+
+  transceiver_to_nic_families:
+    - transceiver_model: "400G DR4 OSFP"
+      compatible_nic_families: ["ConnectX-7", "ConnectX-8"]
+      speed_match: "400G <-> 400G"
+      notes: "Single-mode 500m."
+    - transceiver_model: "400G FR4 OSFP"
+      compatible_nic_families: ["ConnectX-7", "ConnectX-8"]
+      speed_match: "400G <-> 400G"
+      notes: "Single-mode 2km."
+    - transceiver_model: "400G SR8 OSFP"
+      compatible_nic_families: ["ConnectX-7", "ConnectX-8"]
+      speed_match: "400G <-> 400G"
+      notes: "Multimode 100m."
+    - transceiver_model: "200G FR4 QSFP56"
+      compatible_nic_families: ["ConnectX-6", "ConnectX-7"]
+      speed_match: "200G <-> 200G"
+      notes: "Single-mode 2km."
+    - transceiver_model: "200G SR4 QSFP56"
+      compatible_nic_families: ["ConnectX-6", "ConnectX-7"]
+      speed_match: "200G <-> 200G"
+      notes: "Multimode 100m."
+    - transceiver_model: "100G SR4 QSFP28"
+      compatible_nic_families: ["ConnectX-6", "ConnectX-6 Lx"]
+      speed_match: "100G <-> 100G"
+      notes: "Multimode 100m."
+    - transceiver_model: "100G LR4 QSFP28"
+      compatible_nic_families: ["ConnectX-6", "ConnectX-6 Lx"]
+      speed_match: "100G <-> 100G"
+      notes: "Single-mode 10km."
+
+  transceiver_to_switch_models:
+    - switch_model: "NVIDIA Quantum-2 QM9700"
+      transceiver_model: "400G DR4 OSFP"
+      port_match: "OSFP <-> OSFP"
+      notes: "InfiniBand."
+    - switch_model: "NVIDIA Quantum-2 QM9700"
+      transceiver_model: "400G FR4 OSFP"
+      port_match: "OSFP <-> OSFP"
+      notes: "Long-distance option."
+    - switch_model: "NVIDIA Quantum-2 QM8790"
+      transceiver_model: "400G DR4 OSFP"
+      port_match: "OSFP <-> OSFP"
+      notes: "Small- to medium-scale cluster."
+    - switch_model: "NVIDIA Spectrum-X SN4600"
+      transceiver_model: "400G DR4 OSFP"
+      port_match: "OSFP <-> OSFP"
+      notes: "Ethernet."
+    - switch_model: "NVIDIA Quantum QM8700"
+      transceiver_model: "200G FR4 QSFP56"
+      port_match: "QSFP56 <-> QSFP56"
+      notes: "InfiniBand."
+    - switch_model: "NVIDIA Quantum QM8700"
+      transceiver_model: "200G SR4 QSFP56"
+      port_match: "QSFP56 <-> QSFP56"
+      notes: "Short-distance option."
+    - switch_model: "NVIDIA Spectrum-3 SN3700"
+      transceiver_model: "200G FR4 QSFP56"
+      port_match: "QSFP56 <-> QSFP56"
+      notes: "Ethernet."
+    - switch_model: "NVIDIA Spectrum-3 SN3700"
+      transceiver_model: "100G SR4 QSFP28"
+      port_match: "QSFP28 adaptation"
+      notes: "Requires a QSFP28-capable variant or adaptation path."
+
+  cable_to_transceivers:
+    - cable_model: "NVIDIA 400G AOC"
+      compatible_transceiver_models: ["400G DR4 OSFP", "400G FR4 OSFP"]
+      speed_match: "400G <-> 400G"
+      supported_lengths: ["3m", "5m", "10m"]
+    - cable_model: "NVIDIA 200G AOC"
+      compatible_transceiver_models: ["200G FR4 QSFP56"]
+      speed_match: "200G <-> 200G"
+      supported_lengths: ["3m", "5m", "10m"]
+    - cable_model: "NVIDIA 100G AOC"
+      compatible_transceiver_models: ["100G SR4 QSFP28"]
+      speed_match: "100G <-> 100G"
+      supported_lengths: ["3m", "5m", "10m"]
+    - cable_model: "NVIDIA 400G DAC"
+      compatible_transceiver_models: ["400G DR4 OSFP"]
+      speed_match: "400G <-> 400G"
+      supported_lengths: ["1m", "2m", "3m"]
+      notes: "Direct-attach path."
+    - cable_model: "NVIDIA 200G DAC"
+      compatible_transceiver_models: ["200G FR4 QSFP56"]
+      speed_match: "200G <-> 200G"
+      supported_lengths: ["1m", "2m", "3m"]
+      notes: "Direct-attach path."
+    - cable_model: "NVIDIA 100G DAC"
+      compatible_transceiver_models: ["100G SR4 QSFP28"]
+      speed_match: "100G <-> 100G"
+      supported_lengths: ["1m", "2m", "3m"]
+      notes: "Direct-attach path."
+
+validation_rules:
+  speed_matching:
+    allowed_pairs:
+      - device_speed: "400G"
+        compatible_speeds: ["400G"]
+        notes: "No downshift support is documented."
+      - device_speed: "200G"
+        compatible_speeds: ["200G", "100G"]
+        notes: "100G is supported but not recommended."
+      - device_speed: "100G"
+        compatible_speeds: ["100G"]
+        notes: "Exact speed only."
+    discouraged_pairs:
+      - "200G NIC <-> 100G switch"
+      - "400G NIC <-> 200G switch unless a special adapter path is explicitly validated"
+
+  port_capacity:
+    minimum_reserved_ports:
+      mode: "max"
+      values:
+        percent: 10
+        absolute_ports: 2
+    formulas:
+      required_switch_ports: "(nic_port_count_per_server * server_count) * (1 + redundancy_ratio)"
+      recommended_redundancy_ratio_range: "10% - 20%"
+    examples:
+      - scenario: "8 servers with 2x400G NIC ports each"
+        computed_required_ports: "8 * 2 * 1.1 = 17.6"
+        recommended_switch_port_budget: 20
+      - scenario: "16 servers with 2x200G NIC ports each"
+        computed_required_ports: "16 * 2 * 1.15 = 36.8"
+        recommended_switch_port_budget: 40
+
+  high_availability:
+    n_plus_one_rules:
+      - device_type: "switch"
+        rule: "Required switch count + 1 spare unit."
+      - device_type: "management_nic"
+        rule: "At least 2 management ports per server."
+      - device_type: "data_nic"
+        rule: "At least 2 data NICs per server for critical workloads."
+    architecture_rules:
+      - architecture_type: "fat_tree"
+        rule: "At least two switch layers with N+1 redundancy per layer."
+      - architecture_type: "clos"
+        rule: "Both spine and leaf layers require redundancy."
+      - architecture_type: "direct_connect"
+        rule: "Dual NICs, each connected to a different switch."
+
+validation_checklist:
+  - "Verify GPU to NIC family compatibility."
+  - "Verify interconnect mode alignment."
+  - "Verify NIC to switch port type compatibility."
+  - "Verify NIC to switch speed compatibility."
+  - "Verify transceiver to NIC and switch compatibility."
+  - "Verify cable type, speed, and length constraints."
+  - "Verify switch port capacity and redundancy budget."
+  - "Verify high-availability design rules."
