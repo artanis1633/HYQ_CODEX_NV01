@@ -138,12 +138,12 @@ class KnowledgeBaseConfig:
     EMBEDDING_MODEL = "text-embedding-ada-002"
     
     NVIDIA_OFFICIAL_URLS = {
-        "nic": "https://www.nvidia.com/en-us/networking/ethernet/adapters/",
-        "switch": "https://www.nvidia.com/en-us/networking/ethernet/switches/",
-        "transceiver": "https://www.nvidia.com/en-us/networking/ethernet/transceivers/",
-        "cable": "https://www.nvidia.com/en-us/networking/ethernet/cables/",
-        "best_practice": "https://www.nvidia.com/en-us/networking/solutions/",
-        "architecture": "https://www.nvidia.com/en-us/networking/solutions/hpc/"
+        "nic": "https://docs.nvidia.com/networking/",
+        "switch": "https://www.nvidia.com/en-us/networking/ethernet-switching/",
+        "transceiver": "https://www.nvidia.com/en-us/networking/interconnect/",
+        "cable": "https://www.nvidia.com/en-us/networking/interconnect/",
+        "best_practice": "https://docs.nvidia.com/dgx-basepod/reference-architecture-infrastructure-foundation-enterprise-ai/latest/core-components.html",
+        "architecture": "https://docs.nvidia.com/dgx-basepod/reference-architecture-infrastructure-foundation-enterprise-ai/latest/core-components.html"
     }
 
 

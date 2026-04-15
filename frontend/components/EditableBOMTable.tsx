@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { BOMItem } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './Card';
 import { Button } from './Button';
@@ -16,6 +15,7 @@ interface EditableBOMTableProps {
   onValidate?: () => void;
   onExport?: () => void;
   isLoading?: boolean;
+  isExporting?: boolean;
 }
 
 const typeColors = {
@@ -42,10 +42,9 @@ export default function EditableBOMTable({
   onRecalculate,
   onValidate,
   onExport,
-  isLoading = false 
+  isLoading = false,
+  isExporting = false
 }: EditableBOMTableProps) {
-  const [editingId, setEditingId] = useState<string | null>(null);
-
   const renderItemDetails = (item: BOMItem) => {
     switch (item.type) {
       case 'nic':
@@ -148,6 +147,7 @@ export default function EditableBOMTable({
             variant="outline"
             size="sm"
             onClick={onExport}
+            isLoading={isExporting}
           >
             <Download className="h-4 w-4 mr-2" />
             导出Excel

@@ -1,7 +1,11 @@
 import uuid
 import os
+from io import BytesIO
 from typing import Optional, List
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, UploadFile, File
+from fastapi.responses import StreamingResponse
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment
 from sqlalchemy.orm import Session
 from pydantic import ValidationError
 
@@ -20,11 +24,127 @@ from app.api.v1.schemas import (
     KnowledgeBaseDocumentListResponse,
     KnowledgeBaseSearchRequest,
     KnowledgeBaseSearchResponse,
-    FileUploadResponse
+    FileUploadResponse,
+    ExcelExportRequest
 )
 from app.config import settings
 
 router = APIRouter()
+
+
+HEADER_FILL = PatternFill(fill_type="solid", fgColor="1F2937")
+HEADER_FONT = Font(color="FFFFFF", bold=True)
+SECTION_FONT = Font(bold=True, color="76B900")
+WRAP_ALIGNMENT = Alignment(vertical="top", wrap_text=True)
+
+
+def _style_header_row(row) -> None:
+    for cell in row:
+        cell.fill = HEADER_FILL
+        cell.font = HEADER_FONT
+        cell.alignment = WRAP_ALIGNMENT
+
+
+def _autosize_columns(worksheet) -> None:
+    for column_cells in worksheet.columns:
+        max_length = 0
+        column_letter = column_cells[0].column_letter
+        for cell in column_cells:
+            cell.alignment = WRAP_ALIGNMENT
+            value = "" if cell.value is None else str(cell.value)
+            max_length = max(max_length, min(len(value), 60))
+        worksheet.column_dimensions[column_letter].width = max(14, max_length + 2)
+
+
+def build_excel_workbook(payload: ExcelExportRequest) -> BytesIO:
+    workbook = Workbook()
+    summary_sheet = workbook.active
+    summary_sheet.title = "配置概览"
+
+    input_config = payload.input_config or {}
+    result = payload.result or {}
+    nic_recommendation = result.get("nic_recommendation", {})
+    network_design = result.get("network_design", {})
+    validation_report = result.get("validation_report", {})
+
+    summary_sheet.append(["模块", "内容"])
+    _style_header_row(summary_sheet[1])
+    summary_rows = [
+        ("服务器数量", input_config.get("server_count", "")),
+        ("应用场景", input_config.get("use_case", "")),
+        ("组网路线", input_config.get("fabric_type", "")),
+        ("GPU 配置", " / ".join(
+            f"{gpu.get('model', '')} x{gpu.get('count', '')} ({gpu.get('interconnect', '')})"
+            for gpu in input_config.get("gpu_configs", [])
+        )),
+        ("推荐网卡型号", nic_recommendation.get("full_model", "")),
+        ("每台网卡数量", nic_recommendation.get("count_per_server", "")),
+        ("技术路线交换机", network_design.get("switch_type", "")),
+        ("GPU 输入摘要", network_design.get("gpu_context_summary", "")),
+        ("带宽级别判断", network_design.get("bandwidth_tier", "")),
+        ("带宽分析", network_design.get("bandwidth_analysis_summary", "")),
+        ("单机对外网络带宽", network_design.get("single_server_network_bandwidth", "")),
+        ("性能预估", " / ".join(
+            f"{key}: {value}" for key, value in (network_design.get("performance_estimate", {}) or {}).items()
+        )),
+        ("高可用设计", network_design.get("high_availability_design", "")),
+        ("扩展性建议", network_design.get("scalability_suggestions", "")),
+        ("校验评分", validation_report.get("validation_score", "")),
+    ]
+    for row in summary_rows:
+        summary_sheet.append(row)
+
+    rationale_sheet = workbook.create_sheet("配置依据")
+    rationale_sheet.append(["类型", "说明"])
+    _style_header_row(rationale_sheet[1])
+    for item in network_design.get("nic_sizing_rationale", []) or []:
+        rationale_sheet.append(["网卡数量依据", item])
+    for item in network_design.get("cabling_guidance", []) or []:
+        rationale_sheet.append(["链路规划提示", item])
+    for item in nic_recommendation.get("planning_notes", []) or []:
+        rationale_sheet.append(["推荐说明", item])
+    for item in validation_report.get("optimization_suggestions", []) or []:
+        rationale_sheet.append(["优化建议", item])
+    rationale_text = validation_report.get("configuration_rationale")
+    if rationale_text:
+        rationale_sheet.append(["校验依据", rationale_text])
+
+    bom_sheet = workbook.create_sheet("BOM清单")
+    bom_sheet.append(["类型", "名称", "完整型号", "数量", "端口数", "端口类型", "速率", "距离", "线缆类型", "长度", "接口类型", "链接"])
+    _style_header_row(bom_sheet[1])
+    for item in result.get("bom_list", []) or []:
+        bom_sheet.append([
+            item.get("type", ""),
+            item.get("name", ""),
+            item.get("full_model", ""),
+            item.get("quantity", ""),
+            item.get("port_count", ""),
+            item.get("port_type", ""),
+            item.get("speed", ""),
+            item.get("distance", ""),
+            item.get("cable_type", ""),
+            item.get("length", ""),
+            item.get("interface_type", ""),
+            item.get("link", ""),
+        ])
+
+    validation_sheet = workbook.create_sheet("校验结果")
+    validation_sheet.append(["严重级别", "问题", "建议"])
+    _style_header_row(validation_sheet[1])
+    for issue in validation_report.get("issues", []) or []:
+        validation_sheet.append([
+            issue.get("severity", ""),
+            issue.get("message", ""),
+            issue.get("suggestion", ""),
+        ])
+
+    for sheet in workbook.worksheets:
+        _autosize_columns(sheet)
+
+    output = BytesIO()
+    workbook.save(output)
+    output.seek(0)
+    return output
 
 
 def process_configuration_task(task_id: str, db: Session):
@@ -32,6 +152,7 @@ def process_configuration_task(task_id: str, db: Session):
         from app.chains.nic_recommendation_chain import get_nic_recommendation
         from app.chains.network_design_chain import get_network_design
         from app.chains.bom_generation_chain import get_bom_list
+        from app.chains.validation_chain import get_validation_report
         
         config_history = crud.get_config_history_by_task_id(db, task_id)
         if not config_history:
@@ -43,6 +164,12 @@ def process_configuration_task(task_id: str, db: Session):
             nic_recommendation = get_nic_recommendation(input_config)
             network_design = get_network_design(input_config, nic_recommendation)
             bom_list = get_bom_list(network_design, nic_recommendation, input_config)
+            validation_report = get_validation_report(
+                input_config,
+                nic_recommendation,
+                network_design,
+                bom_list
+            )
             
             crud.update_config_history_result(
                 db,
@@ -50,6 +177,7 @@ def process_configuration_task(task_id: str, db: Session):
                 nic_recommendation=nic_recommendation.dict() if hasattr(nic_recommendation, 'dict') else nic_recommendation,
                 network_design=network_design.dict() if hasattr(network_design, 'dict') else network_design,
                 bom_list=[item.dict() if hasattr(item, 'dict') else item for item in bom_list],
+                validation_report=validation_report.dict() if hasattr(validation_report, 'dict') else validation_report,
                 status="completed"
             )
         except Exception as e:
@@ -154,6 +282,24 @@ async def get_configuration_history(
         history=history_list,
         total_count=total_count
     )
+
+
+@router.post("/export/excel")
+async def export_configuration_excel(payload: ExcelExportRequest):
+    try:
+        file_buffer = build_excel_workbook(payload)
+        filename_prefix = payload.filename_prefix or "nvidia-config"
+        filename = f"{filename_prefix}.xlsx"
+        headers = {
+            "Content-Disposition": f'attachment; filename="{filename}"'
+        }
+        return StreamingResponse(
+            file_buffer,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers=headers,
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to export Excel: {exc}")
 
 
 # ==================== 知识库管理 API ====================

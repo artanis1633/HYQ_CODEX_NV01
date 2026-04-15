@@ -1,7 +1,7 @@
 export interface GPUConfig {
   model: string;
   count: number;
-  interconnect: 'NVLink' | 'NVSwitch' | 'PCIe';
+  interconnect: 'NVLink' | 'PCIe';
 }
 
 export type FabricType = 'InfiniBand' | 'RoCE';
@@ -50,6 +50,12 @@ export interface NetworkDesign {
   highAvailability: string;
   performanceEstimate: string;
   scalability: string;
+  gpuContextSummary: string;
+  bandwidthAnalysisSummary: string;
+  bandwidthTier: string;
+  singleServerNetworkBandwidth: string;
+  nicSizingRationale: string[];
+  analysisSource: string;
   cablingGuidance: string[];
   referenceLinks: string[];
 }

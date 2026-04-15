@@ -2,12 +2,28 @@
 
 import { useState } from 'react';
 import { ServerConfig, GPUConfig } from '@/lib/types';
+import { getAllowedInterconnects, getLockedInterconnect } from '@/lib/gpuRules';
 import { Button } from './Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './Card';
 import { Plus, Trash2, Cpu, Server, Zap, Router, Cable } from 'lucide-react';
 
-const GPU_MODELS = ['H100', 'H200', 'A100', 'A800', 'L40S', 'L4', 'RTX 6000'];
-const INTERCONNECT_MODES = ['NVSwitch', 'NVLink', 'PCIe'];
+const GPU_MODELS = [
+  'H200 SXM5',
+  'H200 PCIe (NVL)',
+  'H20 SXM',
+  'L20 PCIe',
+  'A100 PCIe',
+  'A100 SXM',
+  'A800 PCIe',
+  'A800 SXM',
+  'H100 PCIe',
+  'H100 SXM',
+  'H800 PCIe',
+  'H800 SXM',
+  'A40 PCIe',
+  'L40 PCIe',
+  'RTX PRO 6000D PCIe'
+];
 const USE_CASES = ['AI_training', 'AI_inference', 'HPC', 'Data_analytics'];
 const FABRIC_TYPES = [
   { value: 'InfiniBand', label: 'InfiniBand 组网' },
@@ -33,11 +49,11 @@ export default function ConfigForm({ onSubmit, isLoading = false }: ConfigFormPr
   const [switchToSwitchDistanceMeters, setSwitchToSwitchDistanceMeters] = useState(5);
   const [linkPreference, setLinkPreference] = useState<ServerConfig['linkPreference']>('auto');
   const [gpuConfigs, setGpuConfigs] = useState<GPUConfig[]>([
-    { model: 'H100', count: 8, interconnect: 'NVSwitch' }
+    { model: 'H100 SXM', count: 8, interconnect: 'NVLink' }
   ]);
 
   const addGpuConfig = () => {
-    setGpuConfigs([...gpuConfigs, { model: 'H100', count: 4, interconnect: 'NVLink' }]);
+    setGpuConfigs([...gpuConfigs, { model: 'H100 SXM', count: 4, interconnect: 'NVLink' }]);
   };
 
   const removeGpuConfig = (index: number) => {
@@ -48,7 +64,14 @@ export default function ConfigForm({ onSubmit, isLoading = false }: ConfigFormPr
 
   const updateGpuConfig = (index: number, field: keyof GPUConfig, value: string | number) => {
     const newConfigs = [...gpuConfigs];
-    newConfigs[index] = { ...newConfigs[index], [field]: value };
+    const nextConfig = { ...newConfigs[index], [field]: value } as GPUConfig;
+    if (field === 'model') {
+      const lockedInterconnect = getLockedInterconnect(String(value));
+      if (lockedInterconnect) {
+        nextConfig.interconnect = lockedInterconnect;
+      }
+    }
+    newConfigs[index] = nextConfig;
     setGpuConfigs(newConfigs);
   };
 
@@ -162,10 +185,10 @@ export default function ConfigForm({ onSubmit, isLoading = false }: ConfigFormPr
                 serverToSwitchDistanceMeters: 3,
                 switchToSwitchDistanceMeters: 5,
                 linkPreference: 'auto',
-                gpuConfigs: [{ model: 'H100', count: 8, interconnect: 'NVSwitch' }]
+                gpuConfigs: [{ model: 'H100 SXM', count: 8, interconnect: 'NVLink' }]
               })}
             >
-              H100 8-GPU 训练集群 (InfiniBand)
+              H100 SXM 8-GPU 训练集群 (InfiniBand)
             </Button>
             <Button
               type="button"
@@ -178,10 +201,10 @@ export default function ConfigForm({ onSubmit, isLoading = false }: ConfigFormPr
                 serverToSwitchDistanceMeters: 8,
                 switchToSwitchDistanceMeters: 15,
                 linkPreference: 'auto',
-                gpuConfigs: [{ model: 'L40S', count: 4, interconnect: 'PCIe' }]
+                gpuConfigs: [{ model: 'L20 PCIe', count: 4, interconnect: 'PCIe' }]
               })}
             >
-              L40S 推理工作站 (ROCE)
+              L20 / L40 推理工作站 (ROCE)
             </Button>
           </CardContent>
         </Card>
@@ -207,7 +230,11 @@ export default function ConfigForm({ onSubmit, isLoading = false }: ConfigFormPr
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {gpuConfigs.map((config, index) => (
+            {gpuConfigs.map((config, index) => {
+              const allowedInterconnects = getAllowedInterconnects(config.model);
+              const lockedInterconnect = getLockedInterconnect(config.model);
+
+              return (
               <div key={index} className="flex flex-wrap gap-4 items-end p-4 border border-gray-700 rounded-lg bg-gray-800/50">
                 <div className="flex-1 min-w-[150px]">
                   <label className="block text-sm font-medium text-gray-300 mb-1">
@@ -242,13 +269,21 @@ export default function ConfigForm({ onSubmit, isLoading = false }: ConfigFormPr
                   </label>
                   <select
                     value={config.interconnect}
-                    onChange={(e) => updateGpuConfig(index, 'interconnect', e.target.value)}
+                    onChange={(e) => updateGpuConfig(index, 'interconnect', e.target.value as GPUConfig['interconnect'])}
+                    disabled={!!lockedInterconnect}
                     className="w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-nvidia-green"
                   >
-                    {INTERCONNECT_MODES.map((mode) => (
+                    {allowedInterconnects.map((mode) => (
                       <option key={mode} value={mode}>{mode}</option>
                     ))}
                   </select>
+                  <p className="mt-1 text-xs text-gray-500">
+                    {config.model.includes('SXM')
+                      ? 'SXM 形态默认按 NVLink 处理。'
+                      : config.model.includes('PCIe')
+                        ? 'PCIe 形态仅允许 PCIe。'
+                        : '当前型号允许手动选择互联模式。'}
+                  </p>
                 </div>
                 <Button
                   type="button"
@@ -261,7 +296,7 @@ export default function ConfigForm({ onSubmit, isLoading = false }: ConfigFormPr
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
-            ))}
+            )})}
           </div>
         </CardContent>
       </Card>

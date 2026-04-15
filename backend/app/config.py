@@ -3,6 +3,12 @@ from typing import List
 
 
 class Settings(BaseSettings):
+    LLM_API_KEY: str = ""
+    LLM_BASE_URL: str = ""
+    LLM_MODEL: str = ""
+    LLM_TEMPERATURE: float = 0.2
+    LLM_MAX_TOKENS: int = 1200
+
     OPENAI_API_KEY: str = ""
     OPENAI_MODEL: str = "gpt-4-1106-preview"
     OPENAI_TEMPERATURE: float = 0.7
@@ -24,6 +30,26 @@ class Settings(BaseSettings):
     @property
     def cors_origins_list(self) -> List[str]:
         return [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
+
+    @property
+    def effective_llm_api_key(self) -> str:
+        return self.LLM_API_KEY or self.OPENAI_API_KEY
+
+    @property
+    def effective_llm_base_url(self) -> str:
+        return self.LLM_BASE_URL or "https://api.openai.com/v1"
+
+    @property
+    def effective_llm_model(self) -> str:
+        return self.LLM_MODEL or self.OPENAI_MODEL
+
+    @property
+    def effective_llm_temperature(self) -> float:
+        return self.LLM_TEMPERATURE if self.LLM_API_KEY else self.OPENAI_TEMPERATURE
+
+    @property
+    def effective_llm_max_tokens(self) -> int:
+        return self.LLM_MAX_TOKENS if self.LLM_API_KEY else self.OPENAI_MAX_TOKENS
 
     class Config:
         env_file = ".env"

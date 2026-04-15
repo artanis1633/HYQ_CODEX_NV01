@@ -88,6 +88,12 @@ class NetworkDesign(BaseModel):
     high_availability_design: str = Field(..., description="高可用性设计说明")
     performance_estimate: Dict[str, Any] = Field(..., description="性能预估，包括带宽、延迟等")
     scalability_suggestions: str = Field(..., description="扩展性建议")
+    gpu_context_summary: str = Field(..., description="GPU 型号与互联模式摘要")
+    bandwidth_analysis_summary: str = Field(..., description="带宽分析摘要")
+    bandwidth_tier: str = Field(..., description="带宽级别")
+    single_server_network_bandwidth: str = Field(..., description="单台服务器对外网络理论带宽")
+    nic_sizing_rationale: List[str] = Field(default_factory=list, description="网卡数量配置依据")
+    analysis_source: str = Field(..., description="分析来源：ai 或 heuristic")
     cabling_guidance: List[str] = Field(default_factory=list, description="线缆与模块策略说明")
     reference_links: List[str] = Field(..., description="NVIDIA参考架构链接列表")
 
@@ -187,6 +193,12 @@ class ValidationRequest(BaseModel):
 
 class ValidationResponse(ValidationReport):
     pass
+
+
+class ExcelExportRequest(BaseModel):
+    input_config: Dict[str, Any] = Field(..., description="当前输入配置")
+    result: Dict[str, Any] = Field(..., description="当前配置结果")
+    filename_prefix: Optional[str] = Field(None, description="导出文件名前缀")
 
 
 class KnowledgeBaseDocumentCreate(BaseModel):

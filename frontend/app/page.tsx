@@ -6,11 +6,21 @@ import ConfigForm from '@/components/ConfigForm';
 import NICCard from '@/components/NICCard';
 import NetworkDiagram from '@/components/NetworkDiagram';
 import EditableBOMTable from '@/components/EditableBOMTable';
+import BOMItemEditor from '@/components/BOMItemEditor';
 import ValidationPanel from '@/components/ValidationPanel';
 import { ServerConfig, ConfigResult, BOMItem } from '@/lib/types';
 import { generateMockConfigResult } from '@/lib/mockData';
+import { exportConfigurationExcel, requestConfiguration } from '@/lib/api';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/Button';
+
+type BomEditorState =
+  | {
+      mode: 'add' | 'edit';
+      type: BOMItem['type'];
+      item?: BOMItem;
+    }
+  | null;
 
 export default function Home() {
   const [step, setStep] = useState<'form' | 'result'>('form');
@@ -18,16 +28,27 @@ export default function Home() {
   const [result, setResult] = useState<ConfigResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [loadMessage, setLoadMessage] = useState('正在生成配置方案...');
+  const [bomEditor, setBomEditor] = useState<BomEditorState>(null);
 
   const handleSubmit = async (serverConfig: ServerConfig) => {
     setConfig(serverConfig);
     setIsLoading(true);
     setStep('result');
-    
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setResult(generateMockConfigResult(serverConfig));
-    setIsLoading(false);
+
+    try {
+      setLoadMessage('正在调用后端配置引擎...');
+      const liveResult = await requestConfiguration(serverConfig);
+      setResult(liveResult);
+    } catch (error) {
+      console.error('Falling back to mock result:', error);
+      setLoadMessage('后端暂不可用，已切换到本地演示结果...');
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      setResult(generateMockConfigResult(serverConfig));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleBack = () => {
@@ -36,19 +57,53 @@ export default function Home() {
   };
 
   const handleEditBOM = (item: BOMItem) => {
-    console.log('Edit item:', item);
+    setBomEditor({
+      mode: 'edit',
+      type: item.type,
+      item
+    });
   };
 
   const handleAddBOM = (type: BOMItem['type']) => {
-    console.log('Add item type:', type);
+    setBomEditor({
+      mode: 'add',
+      type
+    });
   };
 
   const handleDeleteBOM = (itemId: string) => {
-    console.log('Delete item:', itemId);
+    setResult((prev) => {
+      if (!prev) {
+        return prev;
+      }
+      return {
+        ...prev,
+        bomList: prev.bomList.filter((item) => item.id !== itemId)
+      };
+    });
   };
 
   const handleRecalculate = () => {
-    console.log('Recalculate BOM');
+    if (!config) {
+      return;
+    }
+    setResult((prev) => {
+      if (!prev) {
+        return prev;
+      }
+      return {
+        ...prev,
+        validationReport: prev.validationReport
+          ? {
+              ...prev.validationReport,
+              configurationBasis: [
+                ...prev.validationReport.configurationBasis,
+                'BOM 已手动调整，当前结果为演示态重算；后续可接入后端二次校验与数量联动。'
+              ]
+            }
+          : prev.validationReport
+      };
+    });
   };
 
   const handleValidate = () => {
@@ -58,8 +113,41 @@ export default function Home() {
     }, 2000);
   };
 
-  const handleExport = () => {
-    console.log('Export to Excel');
+  const handleExport = async () => {
+    if (!config || !result) {
+      return;
+    }
+    setIsExporting(true);
+    try {
+      await exportConfigurationExcel(config, result);
+    } catch (error) {
+      console.error('Excel export failed:', error);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleSaveBOMItem = (item: BOMItem) => {
+    setResult((prev) => {
+      if (!prev) {
+        return prev;
+      }
+
+      const existingIndex = prev.bomList.findIndex((existing) => existing.id === item.id);
+      const nextBomList = [...prev.bomList];
+
+      if (existingIndex >= 0) {
+        nextBomList[existingIndex] = item;
+      } else {
+        nextBomList.push(item);
+      }
+
+      return {
+        ...prev,
+        bomList: nextBomList
+      };
+    });
+    setBomEditor(null);
   };
 
   return (
@@ -92,7 +180,7 @@ export default function Home() {
             {isLoading ? (
               <div className="flex flex-col items-center justify-center py-24 space-y-4">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#76B900]"></div>
-                <p className="text-gray-400 text-lg">正在使用LangChain生成配置方案...</p>
+                <p className="text-gray-400 text-lg">{loadMessage}</p>
               </div>
             ) : result ? (
               <>
@@ -106,6 +194,7 @@ export default function Home() {
                   onRecalculate={handleRecalculate}
                   onValidate={handleValidate}
                   onExport={handleExport}
+                  isExporting={isExporting}
                 />
                 <ValidationPanel
                   report={result.validationReport}
@@ -116,6 +205,15 @@ export default function Home() {
           </div>
         )}
       </main>
+      {bomEditor ? (
+        <BOMItemEditor
+          mode={bomEditor.mode}
+          type={bomEditor.type}
+          initialItem={bomEditor.item}
+          onClose={() => setBomEditor(null)}
+          onSave={handleSaveBOMItem}
+        />
+      ) : null}
     </div>
   );
 }

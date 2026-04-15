@@ -1,6 +1,6 @@
 import { NetworkDesign } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './Card';
-import { Layers, Shield, Gauge, TrendingUp, ExternalLink } from 'lucide-react';
+import { Layers, Shield, Gauge, TrendingUp, ExternalLink, Cpu, Route, BrainCircuit } from 'lucide-react';
 
 interface NetworkDiagramProps {
   data: NetworkDesign;
@@ -20,10 +20,27 @@ export default function NetworkDiagram({ data }: NetworkDiagramProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="p-4 border border-gray-700 rounded-lg">
             <div className="flex items-center gap-2 mb-3">
+              <Cpu className="h-5 w-5 text-emerald-400" />
+              <h4 className="font-semibold text-gray-200">GPU 输入摘要</h4>
+            </div>
+            <p className="text-sm text-gray-400">{data.gpuContextSummary}</p>
+          </div>
+          <div className="p-4 border border-gray-700 rounded-lg">
+            <div className="flex items-center gap-2 mb-3">
               <Layers className="h-5 w-5 text-cyan-400" />
               <h4 className="font-semibold text-gray-200">技术路线</h4>
             </div>
             <p className="text-sm text-gray-400">{data.fabricType} / {data.switchType}</p>
+          </div>
+          <div className="p-4 border border-gray-700 rounded-lg">
+            <div className="flex items-center gap-2 mb-3">
+              <BrainCircuit className="h-5 w-5 text-orange-400" />
+              <h4 className="font-semibold text-gray-200">带宽级别判断</h4>
+            </div>
+            <p className="text-sm text-gray-400">
+              {data.bandwidthTier} / {data.analysisSource === 'ai' ? 'AI分析' : '规则分析'}
+            </p>
+            <p className="mt-2 text-sm text-gray-500">{data.bandwidthAnalysisSummary}</p>
           </div>
           <div className="p-4 border border-gray-700 rounded-lg">
             <div className="flex items-center gap-2 mb-3">
@@ -45,6 +62,7 @@ export default function NetworkDiagram({ data }: NetworkDiagramProps) {
               <h4 className="font-semibold text-gray-200">性能预估</h4>
             </div>
             <p className="text-sm text-gray-400">{data.performanceEstimate}</p>
+            <p className="mt-2 text-sm text-gray-500">单机对外网络理论带宽：{data.singleServerNetworkBandwidth}</p>
           </div>
           <div className="p-4 border border-gray-700 rounded-lg">
             <div className="flex items-center gap-2 mb-3">
@@ -53,6 +71,20 @@ export default function NetworkDiagram({ data }: NetworkDiagramProps) {
             </div>
             <p className="text-sm text-gray-400">{data.scalability}</p>
           </div>
+        </div>
+
+        <div className="rounded-xl border border-gray-800 bg-gray-900/60 p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Route className="h-5 w-5 text-nvidia-green" />
+            <h4 className="font-semibold text-gray-200">网卡数量依据</h4>
+          </div>
+          <ul className="space-y-2">
+            {data.nicSizingRationale.map((item, idx) => (
+              <li key={idx} className="text-sm text-gray-400">
+                {item}
+              </li>
+            ))}
+          </ul>
         </div>
 
         <div>

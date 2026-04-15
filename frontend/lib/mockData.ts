@@ -1,38 +1,87 @@
 import { ConfigResult, ServerConfig } from './types';
 
 const DEFAULT_REFERENCE_LINKS = [
-  "https://www.nvidia.com/en-us/data-center/networking/",
-  "https://docs.nvidia.com/networking/"
+  "https://docs.nvidia.com/dgx-basepod/reference-architecture-infrastructure-foundation-enterprise-ai/latest/core-components.html",
+  "https://www.nvidia.com/en-us/networking/interconnect/"
 ];
 
 function getNicModel(config: ServerConfig) {
+  const gpuModels = config.gpuConfigs.map((gpu) => gpu.model);
+  const totalGpuCount = config.gpuConfigs.reduce((sum, gpu) => sum + gpu.count, 0);
   const isTraining = config.useCase === 'AI_training';
   const hasHighPerformanceInterconnect = config.gpuConfigs.some(
-    (gpu) => gpu.interconnect === 'NVSwitch' || gpu.interconnect === 'NVLink'
+    (gpu) => gpu.interconnect === 'NVLink'
   );
+  const hasSxmGpu = gpuModels.some((model) => model.includes('SXM'));
+  const hasHopperClassGpu = gpuModels.some((model) => /H100|H200|H800|H20/.test(model));
+  const hasAmpereClassGpu = gpuModels.some((model) => /A100|A800/.test(model));
+  const workstationInferenceGpu = gpuModels.every((model) => /L20|L40|A40|RTX PRO 6000D/.test(model));
+  const isReferenceSxmNode = hasHighPerformanceInterconnect && hasSxmGpu && (hasHopperClassGpu || hasAmpereClassGpu);
 
-  if (isTraining || hasHighPerformanceInterconnect || config.fabricType === 'InfiniBand') {
+  if (isReferenceSxmNode && hasHopperClassGpu) {
+    return {
+      fullModel: "ConnectX-7 MCX753105AAS-HEAT",
+      speed: "400G",
+      portType: "OSFP",
+      portCount: 1,
+      countPerServer: Math.max(1, totalGpuCount),
+      officialLinks: [
+        "https://docs.nvidia.com/networking/display/connectx7vpi",
+        "https://docs.nvidia.com/dgx-basepod/reference-architecture-infrastructure-foundation-enterprise-ai/latest/core-components.html",
+        "https://www.nvidia.com/en-us/data-center/dgx-h200/"
+      ]
+    };
+  }
+
+  if (isReferenceSxmNode && hasAmpereClassGpu) {
+    return {
+      fullModel: "ConnectX-6 MCX653105A-ECAT",
+      speed: "200G",
+      portType: "QSFP56",
+      portCount: 1,
+      countPerServer: Math.max(1, totalGpuCount),
+      officialLinks: [
+        "https://docs.nvidia.com/networking/display/connectx6vpi",
+        "https://developer.nvidia.com/blog/defining-ai-innovation-with-dgx-a100/"
+      ]
+    };
+  }
+
+  if (isTraining || hasHighPerformanceInterconnect || hasSxmGpu || hasHopperClassGpu || config.fabricType === 'InfiniBand') {
     return {
       fullModel: "ConnectX-7 MCX75310AAS-HEAT",
-      speed: "400Gbps",
+      speed: "400G",
       portType: "OSFP",
       portCount: 2,
       countPerServer: 2,
       officialLinks: [
-        "https://www.nvidia.com/en-us/networking/ethernet/adapter-cards/connectx-7/",
-        "https://docs.nvidia.com/networking/display/ConnectX7EN"
+        "https://docs.nvidia.com/networking/display/connectx7vpi",
+        "https://docs.nvidia.com/dgx-basepod/reference-architecture-infrastructure-foundation-enterprise-ai/latest/core-components.html"
+      ]
+    };
+  }
+
+  if (workstationInferenceGpu) {
+    return {
+      fullModel: "ConnectX-6 Lx MCX623106AN-CDAT",
+      speed: "200G",
+      portType: "QSFP56",
+      portCount: 2,
+      countPerServer: 1,
+      officialLinks: [
+        "https://docs.nvidia.com/networking/display/connectx6lxen"
       ]
     };
   }
 
   return {
     fullModel: "ConnectX-6 Lx MCX623106AN-CDAT",
-    speed: "200Gbps",
+    speed: "200G",
     portType: "QSFP56",
     portCount: 2,
     countPerServer: 1,
     officialLinks: [
-      "https://www.nvidia.com/en-us/networking/ethernet/adapter-cards/connectx-6-lx/"
+      "https://docs.nvidia.com/networking/display/connectx6lxen"
     ]
   };
 }
@@ -60,25 +109,35 @@ export function generateMockConfigResult(config: ServerConfig): ConfigResult {
   const totalServerFacingPorts = totalNicQuantity * nic.portCount;
   const reservePorts = Math.max(2, Math.ceil(totalServerFacingPorts * 0.1));
   const requiredPorts = totalServerFacingPorts + reservePorts;
+  const prefersQsfp56 = nic.portType === 'QSFP56';
 
   const switchModel =
     config.fabricType === 'InfiniBand'
       ? {
           name: "InfiniBand交换机",
-          type: "Quantum InfiniBand",
-          fullModel: "NVIDIA Quantum-2 QM9700",
+          type: "Quantum-2 / NDR",
+          fullModel: "MQM9790-NS2F",
           portCount: 64,
-          link: "https://www.nvidia.com/en-us/networking/infiniband/switches/quantum-2/"
+          link: "https://www.nvidia.com/en-us/networking/quantum2/"
         }
-      : {
+      : prefersQsfp56
+        ? {
+            name: "RoCE以太网交换机",
+            type: "Spectrum-3 / 200GbE",
+            fullModel: "SN3700",
+            portCount: 64,
+            link: "https://www.nvidia.com/en-us/networking/ethernet-switching/"
+          }
+        : {
           name: "RoCE以太网交换机",
-          type: "Spectrum Ethernet",
-          fullModel: "NVIDIA Spectrum-X SN4600",
+          type: "Spectrum-3 / 400GbE",
+          fullModel: "MSN4700-WS2F",
           portCount: 64,
-          link: "https://www.nvidia.com/en-us/networking/ethernet/switches/spectrum-x/"
+          link: "https://www.nvidia.com/en-us/networking/ethernet-switching/"
         };
 
   const switchQuantity = Math.max(2, Math.ceil(requiredPorts / switchModel.portCount));
+  const interSwitchLinks = Math.max(0, switchQuantity - 1) * 2;
 
   const bomList: ConfigResult['bomList'] = [
     {
@@ -117,7 +176,7 @@ export function generateMockConfigResult(config: ServerConfig): ConfigResult {
       cableType: "直连铜缆 (DAC)",
       length: `${Math.max(1, Math.ceil(config.serverToSwitchDistanceMeters))}m`,
       interfaceType: `${nic.portType}-${nic.portType}`,
-      link: "https://www.nvidia.com/en-us/networking/cables/",
+      link: "https://www.nvidia.com/en-us/networking/interconnect/",
       isEditable: true
     });
   } else if (linkStrategy === 'aoc') {
@@ -130,7 +189,7 @@ export function generateMockConfigResult(config: ServerConfig): ConfigResult {
       cableType: "有源光缆 (AOC)",
       length: `${Math.max(3, Math.ceil(config.serverToSwitchDistanceMeters))}m`,
       interfaceType: `${nic.portType}-${nic.portType}`,
-      link: "https://www.nvidia.com/en-us/networking/cables/",
+      link: "https://www.nvidia.com/en-us/networking/interconnect/",
       isEditable: true
     });
   } else {
@@ -144,7 +203,7 @@ export function generateMockConfigResult(config: ServerConfig): ConfigResult {
         speed: nic.speed,
         portType: nic.portType,
         distance: `${config.serverToSwitchDistanceMeters}m`,
-        link: "https://www.nvidia.com/en-us/networking/transceivers/",
+        link: "https://www.nvidia.com/en-us/networking/interconnect/",
         isEditable: true
       },
       {
@@ -156,7 +215,7 @@ export function generateMockConfigResult(config: ServerConfig): ConfigResult {
         speed: nic.speed,
         portType: nic.portType,
         distance: `${config.serverToSwitchDistanceMeters}m`,
-        link: "https://www.nvidia.com/en-us/networking/transceivers/",
+        link: "https://www.nvidia.com/en-us/networking/interconnect/",
         isEditable: true
       },
       {
@@ -168,10 +227,25 @@ export function generateMockConfigResult(config: ServerConfig): ConfigResult {
         cableType: "无源光纤",
         length: `${Math.ceil(config.serverToSwitchDistanceMeters)}m`,
         interfaceType: `${nic.portType}-${nic.portType}`,
-        link: "https://www.nvidia.com/en-us/networking/cables/",
+        link: "https://www.nvidia.com/en-us/networking/interconnect/",
         isEditable: true
       }
     );
+  }
+
+  if (interSwitchLinks > 0) {
+    bomList.push({
+      id: "cable-inter-switch-1",
+      type: "cable",
+      name: "交换机互联线缆",
+      fullModel: nic.speed.startsWith("400") ? "NVIDIA 400G AOC" : "NVIDIA 200G AOC",
+      quantity: interSwitchLinks,
+      cableType: "交换机互联",
+      length: `${Math.max(3, Math.ceil(config.switchToSwitchDistanceMeters))}m`,
+      interfaceType: `${nic.portType}-${nic.portType}`,
+      link: "https://www.nvidia.com/en-us/networking/interconnect/",
+      isEditable: true
+    });
   }
 
   return {
@@ -215,6 +289,28 @@ export function generateMockConfigResult(config: ServerConfig): ConfigResult {
       highAvailability: "默认按双链路和交换机冗余预留进行计算，后续可在可编辑清单中继续增删设备并重新校验。",
       performanceEstimate: `单台服务器预计提供 ${nic.countPerServer * nic.portCount} 个 ${nic.speed} ${nic.portType} 端口，总体按 ${switchQuantity} 台交换机承载并预留 10% 端口冗余。`,
       scalability: "当前 demo 阶段优先保证主路径可演示，后续会继续增强分层拓扑、DPU 混编和更精细的端口级校验。",
+      gpuContextSummary: config.gpuConfigs.map((gpu) => `${gpu.model} x${gpu.count} (${gpu.interconnect})`).join(' / '),
+      bandwidthAnalysisSummary:
+        nic.countPerServer >= 8
+          ? "当前根据八卡 NVLink 节点的高密度训练特征，将跨节点带宽需求判定为极高，因此采用 GPU:NIC 1:1 的单端口 HCA 路径。"
+          : config.useCase === 'AI_training'
+            ? "当前根据训练场景和 GPU 互联模式判断跨节点带宽需求较高，因此两张高带宽网卡足以支撑演示阶段的主路径。"
+            : "当前根据推理场景和 PCIe 主路径判断跨节点带宽需求中等，因此默认以 1 张网卡控制复杂度。",
+      bandwidthTier: nic.countPerServer >= 8 ? 'extreme' : config.useCase === 'AI_training' ? 'high' : 'medium',
+      singleServerNetworkBandwidth: `${nic.countPerServer * nic.portCount * parseInt(nic.speed, 10)} Gbps`,
+      nicSizingRationale:
+        nic.countPerServer >= 8
+          ? [
+              "SXM + NVLink 说明单机内部 GPU 互联带宽较高，跨节点侧不能只保守配置少量 HCA。",
+              "当前演示按参考架构处理为 GPU:NIC = 1:1，用于解释为什么八卡 NVLink 节点要配置 8 张单端口网卡。",
+              `当前单机对外网络理论带宽约为 ${nic.countPerServer * nic.portCount * parseInt(nic.speed, 10)} Gbps。`
+            ]
+          : [
+              `当前输入的应用场景为 ${config.useCase}，互联模式为 ${config.gpuConfigs.map((gpu) => gpu.interconnect).join(' / ')}。`,
+              "在非八卡 NVLink 参考节点下，系统优先采用更紧凑的双口高带宽路径，因此两张网卡通常足以支撑 demo 主路径。",
+              `当前单机对外网络理论带宽约为 ${nic.countPerServer * nic.portCount * parseInt(nic.speed, 10)} Gbps。`
+            ],
+      analysisSource: 'heuristic',
       cablingGuidance: [
         `服务器到交换机距离按 ${config.serverToSwitchDistanceMeters}m 处理。`,
         `交换机之间距离按 ${config.switchToSwitchDistanceMeters}m 处理。`,
@@ -233,7 +329,7 @@ export function generateMockConfigResult(config: ServerConfig): ConfigResult {
         {
           severity: "info",
           message: `当前方案已按 ${config.fabricType} 技术路线锁定交换设备类型。`,
-          suggestion: config.fabricType === 'InfiniBand' ? "后续继续补充 Quantum 设备和 IB 模块规则。" : "后续继续补充 Spectrum 设备和 RoCE 模块规则。"
+          suggestion: config.fabricType === 'InfiniBand' ? "当前 demo 已优先映射到 MQM9790-NS2F，后续继续补充 Quantum 设备和 IB 模块规则。" : prefersQsfp56 ? "当前 demo 已优先映射到 SN3700 这一类 200G Spectrum 路线，后续继续补充 QSFP56 模块规则。" : "当前 demo 已优先映射到 MSN4700-WS2F，后续继续补充 Spectrum 设备和 RoCE 模块规则。"
         },
         {
           severity: "warning",
@@ -253,7 +349,7 @@ export function generateMockConfigResult(config: ServerConfig): ConfigResult {
 
 export const mockConfigResult = generateMockConfigResult({
   serverCount: 4,
-  gpuConfigs: [{ model: 'H100', count: 8, interconnect: 'NVSwitch' }],
+  gpuConfigs: [{ model: 'H100 SXM', count: 8, interconnect: 'NVLink' }],
   useCase: 'AI_training',
   fabricType: 'InfiniBand',
   dpuPolicy: 'disabled',
