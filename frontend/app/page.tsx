@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import ConfigForm from '@/components/ConfigForm';
 import NICCard from '@/components/NICCard';
 import NetworkDiagram from '@/components/NetworkDiagram';
 import EditableBOMTable from '@/components/EditableBOMTable';
 import BOMItemEditor from '@/components/BOMItemEditor';
+import LoadingPipeline from '@/components/LoadingPipeline';
 import ValidationPanel from '@/components/ValidationPanel';
 import { ServerConfig, ConfigResult, BOMItem } from '@/lib/types';
 import { generateMockConfigResult } from '@/lib/mockData';
@@ -22,6 +23,15 @@ type BomEditorState =
     }
   | null;
 
+const LOADING_STEPS = [
+  '正在提交配置任务',
+  '正在进行规则计算',
+  '正在分析 GPU、互联模式与组网路线',
+  '正在尝试 AI 带宽分析',
+  '正在生成网卡、交换机与链路清单',
+  '正在整理最终结果'
+] as const;
+
 export default function Home() {
   const [step, setStep] = useState<'form' | 'result'>('form');
   const [config, setConfig] = useState<ServerConfig | null>(null);
@@ -30,20 +40,42 @@ export default function Home() {
   const [isValidating, setIsValidating] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [loadMessage, setLoadMessage] = useState('正在生成配置方案...');
+  const [loadNotice, setLoadNotice] = useState<string | null>(null);
+  const [loadingStepIndex, setLoadingStepIndex] = useState(0);
   const [bomEditor, setBomEditor] = useState<BomEditorState>(null);
+
+  useEffect(() => {
+    if (!isLoading) {
+      return;
+    }
+
+    setLoadingStepIndex(0);
+    const interval = window.setInterval(() => {
+      setLoadingStepIndex((current) => Math.min(current + 1, LOADING_STEPS.length - 1));
+    }, 1400);
+
+    return () => window.clearInterval(interval);
+  }, [isLoading]);
 
   const handleSubmit = async (serverConfig: ServerConfig) => {
     setConfig(serverConfig);
     setIsLoading(true);
     setStep('result');
+    setLoadNotice(null);
+    setLoadingStepIndex(0);
 
     try {
-      setLoadMessage('正在调用后端配置引擎...');
+      setLoadMessage('配置引擎正在按流水线生成结果，请稍候...');
       const liveResult = await requestConfiguration(serverConfig);
+      setLoadingStepIndex(LOADING_STEPS.length - 1);
       setResult(liveResult);
     } catch (error) {
       console.error('Falling back to mock result:', error);
-      setLoadMessage('后端暂不可用，已切换到本地演示结果...');
+      const message = error instanceof Error ? error.message : String(error);
+      const timeoutLike = /超时|timeout|timed out/i.test(message);
+      setLoadNotice(timeoutLike ? 'AI 响应超时，已切换本地规则继续生成结果。' : '后端暂不可用，已切换到本地演示结果。');
+      setLoadMessage(timeoutLike ? '外部分析较慢，正在回退到本地规则...' : '后端暂不可用，已切换到本地演示结果...');
+      setLoadingStepIndex(3);
       await new Promise((resolve) => setTimeout(resolve, 800));
       setResult(generateMockConfigResult(serverConfig));
     } finally {
@@ -178,10 +210,13 @@ export default function Home() {
             </div>
 
             {isLoading ? (
-              <div className="flex flex-col items-center justify-center py-24 space-y-4">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#76B900]"></div>
-                <p className="text-gray-400 text-lg">{loadMessage}</p>
-              </div>
+              <LoadingPipeline
+                steps={[...LOADING_STEPS]}
+                currentStep={loadingStepIndex}
+                title="配置清单生成中"
+                description={loadMessage}
+                notice={loadNotice}
+              />
             ) : result ? (
               <>
                 <NICCard data={result.nicRecommendation} />

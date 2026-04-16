@@ -2,12 +2,24 @@ from pydantic_settings import BaseSettings
 from typing import List
 
 
+def _is_placeholder_secret(value: str) -> bool:
+    normalized = (value or "").strip().lower()
+    return normalized in {
+        "",
+        "your_openai_api_key_here",
+        "your_api_key",
+        "your_api_key_here",
+        "sk-your-key",
+    }
+
+
 class Settings(BaseSettings):
     LLM_API_KEY: str = ""
     LLM_BASE_URL: str = ""
     LLM_MODEL: str = ""
     LLM_TEMPERATURE: float = 0.2
     LLM_MAX_TOKENS: int = 1200
+    LLM_TIMEOUT_SECONDS: int = 8
 
     OPENAI_API_KEY: str = ""
     OPENAI_MODEL: str = "gpt-4-1106-preview"
@@ -33,7 +45,8 @@ class Settings(BaseSettings):
 
     @property
     def effective_llm_api_key(self) -> str:
-        return self.LLM_API_KEY or self.OPENAI_API_KEY
+        candidate = self.LLM_API_KEY or self.OPENAI_API_KEY
+        return "" if _is_placeholder_secret(candidate) else candidate
 
     @property
     def effective_llm_base_url(self) -> str:

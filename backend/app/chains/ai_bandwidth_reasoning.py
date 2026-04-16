@@ -1,5 +1,7 @@
 import json
 from typing import Any, Dict, List
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
 
 from app.config import settings
 from app.knowledge.rules_repository import (
@@ -7,11 +9,6 @@ from app.knowledge.rules_repository import (
     get_total_gpu_count,
     is_sxm_nvlink_reference_node,
 )
-
-try:
-    from langchain_openai import ChatOpenAI
-except Exception:  # pragma: no cover - graceful fallback when dependency is unavailable
-    ChatOpenAI = None
 
 
 def build_cluster_context(input_config: Dict[str, Any]) -> Dict[str, Any]:
@@ -153,46 +150,63 @@ def _extract_json_block(content: str) -> Dict[str, Any]:
     return json.loads(cleaned)
 
 
+def _call_openai_compatible_llm(prompt: str) -> Dict[str, Any]:
+    endpoint = f"{settings.effective_llm_base_url.rstrip('/')}/chat/completions"
+    payload = {
+        "model": settings.effective_llm_model,
+        "messages": [
+            {
+                "role": "system",
+                "content": "You are a precise NVIDIA networking assistant. Return JSON only.",
+            },
+            {
+                "role": "user",
+                "content": prompt,
+            },
+        ],
+        "temperature": settings.effective_llm_temperature,
+        "max_tokens": min(settings.effective_llm_max_tokens, 400),
+    }
+    request = Request(
+        endpoint,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {settings.effective_llm_api_key}",
+        },
+        method="POST",
+    )
+    with urlopen(request, timeout=settings.LLM_TIMEOUT_SECONDS) as response:
+        return json.loads(response.read().decode("utf-8"))
+
+
 def get_ai_bandwidth_assessment(input_config: Dict[str, Any]) -> Dict[str, Any]:
-    if not settings.effective_llm_api_key or ChatOpenAI is None:
+    if not settings.effective_llm_api_key:
         return _heuristic_bandwidth_assessment(input_config)
 
     context = build_cluster_context(input_config)
-    prompt = f"""
-你是 NVIDIA 智算网络选型顾问。请根据下面的输入判断当前集群的跨节点带宽级别，并给出每台服务器推荐的网卡数量和候选型号。
-
-必须重点考虑：
-1. 应用场景（训练/推理/HPC）
-2. GPU 型号与数量
-3. GPU 互联模式（尤其 NVLink 与 PCIe 的区别）
-4. 服务器数量
-5. 组网技术路线（InfiniBand / RoCE）
-
-请只输出 JSON，不要输出任何额外说明。字段固定为：
-{{
-  "bandwidth_tier": "low|medium|high|extreme",
-  "recommended_nic_family": "string",
-  "recommended_nic_model": "string",
-  "recommended_count_per_server": 1,
-  "summary": "string",
-  "reasoning": ["string", "string", "string"]
-}}
-
-输入上下文：
-{json.dumps(context, ensure_ascii=False, indent=2)}
-""".strip()
+    prompt = (
+        "根据输入的 GPU 型号、数量、互联模式、应用场景、服务器数量和组网路线，"
+        "判断跨节点带宽级别，并返回每台服务器推荐的网卡数量与型号。"
+        "仅输出 JSON，字段为 "
+        "{\"bandwidth_tier\":\"low|medium|high|extreme\","
+        "\"recommended_nic_family\":\"string\","
+        "\"recommended_nic_model\":\"string\","
+        "\"recommended_count_per_server\":1,"
+        "\"summary\":\"string\","
+        "\"reasoning\":[\"string\",\"string\",\"string\"]}"
+        f" 输入: {json.dumps(context, ensure_ascii=False, separators=(',', ':'))}"
+    )
 
     try:
-        llm = ChatOpenAI(
-            api_key=settings.effective_llm_api_key,
-            base_url=settings.effective_llm_base_url,
-            model=settings.effective_llm_model,
-            temperature=settings.effective_llm_temperature,
-            max_tokens=settings.effective_llm_max_tokens,
+        response = _call_openai_compatible_llm(prompt)
+        content = (
+            response.get("choices", [{}])[0]
+            .get("message", {})
+            .get("content", "")
         )
-        response = llm.invoke(prompt)
-        parsed = _extract_json_block(response.content)
+        parsed = _extract_json_block(content)
         parsed["source"] = "ai"
         return parsed
-    except Exception:
+    except (HTTPError, URLError, TimeoutError, ValueError, KeyError, json.JSONDecodeError, OSError):
         return _heuristic_bandwidth_assessment(input_config)

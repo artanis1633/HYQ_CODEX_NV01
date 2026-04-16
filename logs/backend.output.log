@@ -1,0 +1,44 @@
+INFO:     Will watch for changes in these directories: ['/Users/hyq/DEV SPACE/CODEX/NVIDIA-Build/backend']
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [67098] using WatchFiles
+INFO:     Started server process [67100]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+🚀 NVIDIA Configurator Backend starting...
+📊 Initializing database...
+✅ Database initialized successfully
+INFO:     127.0.0.1:64106 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64406 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64406 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64415 - "OPTIONS /api/v1/configure HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64415 - "POST /api/v1/configure HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64415 - "GET /api/v1/status/6ef37a64-0996-4ff4-b0c4-d27074974a81 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64415 - "GET /api/v1/status/6ef37a64-0996-4ff4-b0c4-d27074974a81 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64415 - "GET /api/v1/status/6ef37a64-0996-4ff4-b0c4-d27074974a81 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64415 - "GET /api/v1/status/6ef37a64-0996-4ff4-b0c4-d27074974a81 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64415 - "GET /api/v1/status/6ef37a64-0996-4ff4-b0c4-d27074974a81 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64415 - "GET /api/v1/status/6ef37a64-0996-4ff4-b0c4-d27074974a81 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64415 - "GET /api/v1/status/6ef37a64-0996-4ff4-b0c4-d27074974a81 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64415 - "GET /api/v1/status/6ef37a64-0996-4ff4-b0c4-d27074974a81 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64415 - "GET /api/v1/status/6ef37a64-0996-4ff4-b0c4-d27074974a81 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64415 - "GET /api/v1/status/6ef37a64-0996-4ff4-b0c4-d27074974a81 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64415 - "GET /api/v1/status/6ef37a64-0996-4ff4-b0c4-d27074974a81 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49892 - "OPTIONS /api/v1/configure HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49892 - "POST /api/v1/configure HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49892 - "GET /api/v1/status/17274313-df6e-47db-aa9d-85990e7d46a2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49892 - "GET /api/v1/status/17274313-df6e-47db-aa9d-85990e7d46a2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49892 - "GET /api/v1/status/17274313-df6e-47db-aa9d-85990e7d46a2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49892 - "GET /api/v1/status/17274313-df6e-47db-aa9d-85990e7d46a2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49892 - "GET /api/v1/status/17274313-df6e-47db-aa9d-85990e7d46a2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49892 - "GET /api/v1/status/17274313-df6e-47db-aa9d-85990e7d46a2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49892 - "GET /api/v1/status/17274313-df6e-47db-aa9d-85990e7d46a2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49892 - "GET /api/v1/status/17274313-df6e-47db-aa9d-85990e7d46a2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49892 - "GET /api/v1/status/17274313-df6e-47db-aa9d-85990e7d46a2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49892 - "GET /api/v1/status/17274313-df6e-47db-aa9d-85990e7d46a2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49892 - "GET /api/v1/status/17274313-df6e-47db-aa9d-85990e7d46a2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49892 - "GET /api/v1/status/17274313-df6e-47db-aa9d-85990e7d46a2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49892 - "GET /api/v1/status/17274313-df6e-47db-aa9d-85990e7d46a2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49892 - "GET /api/v1/status/17274313-df6e-47db-aa9d-85990e7d46a2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49892 - "GET /api/v1/status/17274313-df6e-47db-aa9d-85990e7d46a2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49947 - "OPTIONS /api/v1/export/excel HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49947 - "POST /api/v1/export/excel HTTP/1.1" 200 OK
